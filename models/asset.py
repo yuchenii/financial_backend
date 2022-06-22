@@ -6,6 +6,8 @@
 # @Software: PyCharm
 
 from extensions import db
+from api.utils import get_product_info
+
 
 class AssetModel(db.Model):
     """
@@ -23,3 +25,35 @@ class AssetModel(db.Model):
     a_user_id = db.Column(db.Integer, db.ForeignKey("user.u_id"), nullable=False, comment="用户ID")
     user = db.relationship("UserModel", back_populates="asset_info")
 
+    def __init__(self, a_product_id, a_product_type, a_state, a_number, a_time, a_profit, a_user_id):
+        self.a_product_id = a_product_id
+        self.a_product_type = a_product_type
+        self.a_state = a_state
+        self.a_number = a_number
+        self.a_time = a_time
+        self.a_profit = a_profit
+        self.a_user_id = a_user_id
+
+    def json(self):
+        return {
+            "a_id": self.a_id,
+            "a_product_type": self.a_product_type,
+            "a_product_info": get_product_info(self.a_product_id, self.a_product_type),
+            "a_state": self.a_state,
+            "a_number": self.a_number,
+            "a_time": str(self.a_time),
+            "a_profit": str(self.a_profit),
+            "a_user_id": self.a_user_id
+        }
+
+    @classmethod
+    def find_by_id(cls, a_id):
+        return cls.query.filter_by(a_id=a_id).first()
+
+    @classmethod
+    def find_by_user_id(cls, user_id):
+        return cls.query.filter_by(a_user_id=user_id).all()
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()

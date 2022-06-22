@@ -54,6 +54,14 @@ class UserModel(db.Model):
     def find_all(cls):
         return cls.query.all()
 
+    @classmethod
+    def find_asset_list_by_user_id(cls, user_id):
+        return cls.query.filter_by(u_id=user_id).first().asset_info.all()
+
+    @classmethod
+    def find_bank_card_list_by_user_id(cls, user_id):
+        return cls.query.filter_by(u_id=user_id).first().bank_card_info.all()
+
     def set_password(self, password):
         self.u_password = generate_password_hash(password)
 

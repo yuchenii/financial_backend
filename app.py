@@ -8,6 +8,7 @@
 from flask import Flask
 from extensions import db, jwt, cors
 from auth.views import auth_bp
+from api.views import apiv1_bp
 from config import config
 import os
 
@@ -49,6 +50,7 @@ def register_blueprints(app):
     :return:
     """
     app.register_blueprint(auth_bp)
+    app.register_blueprint(apiv1_bp)
 
 
 def register_request_handlers(app):
