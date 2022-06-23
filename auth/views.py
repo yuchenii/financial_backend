@@ -46,7 +46,9 @@ def user_login():
 
     # 判断用户是否存在，密码是否正确
     if user and user.check_password(password):
-        user = UserIdentity(user.u_id, user.u_type)
+        u_id = user.u_id
+        u_type = user.u_type
+        user = UserIdentity(u_id, u_type)
         # 创建token
         access_token = create_access_token(identity=user)
         refresh_token = create_refresh_token(user)
@@ -57,7 +59,9 @@ def user_login():
             "code": 1,
             "data": {
                 'access_token': access_token,
-                'refresh_token': refresh_token
+                'refresh_token': refresh_token,
+                "user_type": u_type,
+                "user_id": u_id
             },
             "msg": "success"
         }), 200
