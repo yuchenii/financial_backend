@@ -25,7 +25,7 @@ def get_product_info(product_id, product_type):
     elif product_type == 2:
         product_info = FundModel.find_by_id(product_id)
 
-    if product_info:
+    if not product_info:
         return ""
     return product_info.json()
 

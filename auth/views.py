@@ -66,7 +66,7 @@ def user_login():
             "msg": "success"
         }), 200
 
-    return jsonify({'code': 0, 'msg': 'Invalid Credentials'}), 401
+    return jsonify({'code': 0, 'msg': 'Invalid Credentials'}), 400
 
 
 @auth_bp.route('/user_type', methods=['GET'], strict_slashes=False)
