@@ -9,6 +9,7 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from flask import request
 from models.user import UserModel
+from api.utils import paging_query
 
 
 class UserResource(Resource):
@@ -70,12 +71,35 @@ class UserResource(Resource):
 class UserListResource(Resource):
     @jwt_required()
     def get(self):
-        return {'code': 1,
-                'msg': 'u_type 用户类型 0:用户 1：管理员',
-                'data': {
-                    'users': [user.json() for user in UserModel.find_all()]
-                }
-                }, 200
+        if get_jwt()["user_type"] != 1:
+            return {"code": 0, "msg": "permission denied"}, 401
+
+        u_name = request.args.get('u_name', None)
+        if u_name is not None and u_name != "":
+            users = UserModel.query.filter(UserModel.u_name.like("%{}%".format(u_name)))
+            if users is None:
+                return {"code": 0, "msg": "user not found"}, 200
+            return {"code": 1, "msg": "success", "data": {
+                "user_list": [user.json() for user in users]
+            }}, 200
+
+        if request.args.get("page_index", None) is None and request.args.get("page_size", None) is None:
+            return {'code': 1,
+                    'msg': 'u_type 用户类型 0:用户 1：管理员',
+                    'data': {
+                        'users': [user.json() for user in UserModel.find_all()]
+                    }
+                    }, 200
+
+        # 分页查询所有用户
+        page_index = request.args.get("page_index", 1)
+        page_size = request.args.get("page_size", 10)
+
+        res, current_page, total_page, total_count = paging_query(UserModel, int(page_index), int(page_size))
+
+        return {"code": 1, "msg": "success",
+                "data": {"user_list": [x.json() for x in res], "current_page": current_page,
+                         "total_page": total_page, "total_count": total_count}}, 200
 
 
 class UserAssetListResource(Resource):
