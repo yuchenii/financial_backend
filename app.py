@@ -5,7 +5,7 @@
 # @File    : extensions.py
 # @Software: PyCharm
 
-from flask import Flask
+from flask import Flask, render_template
 from extensions import db, jwt, cors
 from auth.views import auth_bp
 from api.views import apiv1_bp
@@ -22,14 +22,21 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv('FLASK_CONFIG', 'development')
 
-    app = Flask('financial_backend')
+    app = Flask('financial_backend', static_folder="./dist/static", template_folder="./dist")
     app.config.from_object(config[config_name])
 
     register_extensions(app)
     register_blueprints(app)
     register_request_handlers(app)
 
+    @app.route('/')
+    def index():
+        return render_template("index.html")
+
     return app
+
+
+
 
 
 def register_extensions(app):
